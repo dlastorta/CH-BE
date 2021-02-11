@@ -59,37 +59,37 @@ router.post("/productos", (req,res)=>{
 
 router.put("/productos/:id", (req,res)=>{
     try{
-        let indice = productos.findIndex((producto) => producto.id == req.params.id);
-        if(indice){
-            productos[indice].title = req.body.title;
-            productos[indice].price = req.body.price;
-            productos[indice].thumbnail = req.body.thumbnail;
-            
-            res.json('Producto Actualizado' + JSON.stringify(productos[indice]));
+        let producto = productos.find(producto => producto.id == req.params.id);
+        if(producto){
+            producto.title = req.body.title;
+            producto.price = req.body.price;
+            producto.thumbnail = req.body.thumbnail;
+            res.json(producto);
         }
         else {
             res.json({error: 'Producto no encontrado'});
         }
     }
     catch(err){
-        res.json({error: "Error actualizando producto"});
+        res.json({error: "Error actualizando producto " + err});
     }
 });
 
 router.delete("/productos/:id", (req,res)=>{
     try{
-        let indice = productos.findIndex((producto) => producto.id == req.params.id);
-        if(indice){
+        let indice = productos.findIndex(producto => producto.id == req.params.id );
+        console.log(indice);
+        if(indice && indice > -1){ 
             let producto = productos[indice]
             productos.splice(indice, 1);
-            res.json('Producto Borrado' + JSON.stringify(producto));
+            res.json(producto);
         }
         else {
             res.json({error: 'Producto no encontrado'});
         }
     }
     catch(err){
-        res.json({error: "Error actualizando producto"});
+        res.json({error: "Error actualizando producto " + err});
     }
 });
 
