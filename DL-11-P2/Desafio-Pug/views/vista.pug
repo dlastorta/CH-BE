@@ -1,0 +1,20 @@
+h2 Lista de Productos
+if productos
+    table.table
+        thead
+            tr
+                th.col ID
+                th.col Nombre
+                th.col Precio
+                th.col Foto
+        tbody
+        each producto in productos
+            th(scope="row")
+                tr
+                    td=producto.id
+                    td=producto.title
+                    td=producto.price
+                    td
+                        img(src=producto.thumbnail)
+else
+    h2 No se encontraron productos

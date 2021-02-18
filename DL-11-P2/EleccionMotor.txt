@@ -1,0 +1,7 @@
+Despues de hacer los ejercicios entre los tres lenguajes no note mucha diferencia sobre ventajas especificas.
+sin embargo tengo que reconocer que la manera de escribir los templates en pug me confundieron un poco.
+prefiero algo que sea lo mas simil a HTML.
+asi que entre los otros dos motores, handlebars me parecio mas practico solamente porque utiliza {{}} para escribir los bloques en JS
+el <% %> por algun motivo me facilita la lectura.
+Creo que HB me recuerda mas a angular mientras que EJS me recuerda a PHP.
+Asi que elijo hacerlo en handlebars

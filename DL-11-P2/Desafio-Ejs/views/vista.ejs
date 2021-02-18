@@ -1,0 +1,21 @@
+<h2>Lista de Productos</h2>
+<% if (productos) { %>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Foto</th>
+        </tr>
+        <% productos.forEach((producto) => { %>
+        <% console.log(producto) %>
+            <tr>
+                <td> <%=producto.id  %> </td>
+                <td> <%=producto.title  %></td>
+                <td> <%=producto.price  %></td>
+                <td><img src=" <%=producto.thumbnail %>"></td>
+            </tr>
+        <% }) %>
+<% } else { %>
+    <h2>No se encontraron productos</h2>
+<% } %>
