@@ -26,12 +26,12 @@ app.use(express.static("public"));
 let item = require('./item');
 let idGen = 1;
 let productos = [
-    {
+    /*{
         id:1,
         title:"ruler",
         price:"100",
         thumbnail:"https://cdn3.iconfinder.com/data/icons/education-209/64/ruler-triangle-stationary-school-128.png"
-    }
+    }*/
 ];
 
 
@@ -44,9 +44,10 @@ app.get('/',(req,res)=>{
 //Events
 io.on('connection', (socket)=>{
     socket.on('AgregarProducto',data=>{
+        console.log("AgregarProducto");
         productos.push(new item(idGen,data.title,data.price,data.thumbnail));
-        idGen++;
-        io.sockets.emit('listar productos', productos);
+        io.emit('ListarProductos', new item(idGen,data.title,data.price,data.thumbnail));
+        idGen++;        
     });
 });
 

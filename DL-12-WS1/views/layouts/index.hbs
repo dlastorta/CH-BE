@@ -13,8 +13,6 @@
         const form = document.getElementById('form');
         
         form.addEventListener('submit', (event) => {
-            console.log('submit');
-            debugger;
             event.preventDefault();
             let title = document.getElementById('title').value;
             let price = document.getElementById('price').value;
@@ -25,9 +23,28 @@
             document.getElementById('thumbnail').value = '';
         });
 
-        socket.on('ListarProductos', (productos)=>{
-            debugger;
-            this.productos = productos;
+        socket.on('ListarProductos', (producto)=>{
+            let header = document.getElementById('header')
+            if(header) { 
+                header.style.display = "none"
+            }
+            document.getElementById('prodTable').style.display = "block"
+            console.log(producto)
+            var tableBody = document.getElementById('table').getElementsByTagName('tbody')[0];
+            var newRow = tableBody.insertRow();
+            var IdCell = newRow.insertCell();
+            var IdText = document.createTextNode(producto.id);
+            IdCell.appendChild(IdText);
+            var titleCell = newRow.insertCell();
+            var titleText = document.createTextNode(producto.title);
+            titleCell.appendChild(titleText);
+            var priceCell = newRow.insertCell();
+            var priceText = document.createTextNode(producto.price);
+            priceCell.appendChild(priceText);
+            var thumbnailCell = newRow.insertCell();
+            var thumbnail = document.createElement('img');
+            thumbnail.src = producto.thumbnail;
+            thumbnailCell.appendChild(thumbnail);
         });
     </script>
 </body>

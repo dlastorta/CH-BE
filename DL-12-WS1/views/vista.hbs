@@ -10,7 +10,7 @@
 
 
 {{#if productos}}
-    <table>
+    <table id="table">
         <tr>
             <th>ID</th>
             <th>Nombre</th>
@@ -27,6 +27,19 @@
         {{/each}}
     </table>
 {{else}}
-    <h2>No se encontraron productos</h2>
+    <div id="header">
+        <h2>No se encontraron productos</h2>
+    </div>
+    <div id="prodTable" style="display: none;">
+        <table id="table">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Foto</th>
+            </tr>       
+        </table>
+    </div>
+     
 {{/if}}
 </form>
