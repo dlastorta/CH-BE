@@ -1,8 +1,9 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
-const router = express.Router();
 const handlebars = require('express-handlebars');
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
 
 app.use(bodyParser.json()); 
@@ -20,14 +21,38 @@ app.engine(
 app.set("views", "./views");
 app.set("view engine", "hbs");
 app.use(express.static("public"));
+
+//productos
+let item = require('./item');
+let idGen = 1;
+let productos = [
+    {
+        id:1,
+        title:"ruler",
+        price:"100",
+        thumbnail:"https://cdn3.iconfinder.com/data/icons/education-209/64/ruler-triangle-stationary-school-128.png"
+    }
+];
+
+
 //Routes
-let productos = require('./producto');
-app.use('/api', productos);
+
+app.get('/',(req,res)=>{
+    res.render("vista", { productos: productos});
+});
+
+//Events
+io.on('connection', (socket)=>{
+    socket.on('AgregarProducto',data=>{
+        productos.push(new item(idGen,data.title,data.price,data.thumbnail));
+        idGen++;
+        io.sockets.emit('listar productos', productos);
+    });
+});
 
 //server
-const PORT = 8080;
-
-const server = app.listen(PORT,()=>{
+const PORT = 3000;
+http.listen(PORT,()=>{
     console.log(`Server Up en Puerto: ${PORT}`);
 });
-server.on('error',error=> console.log(`Server Error: ${error}`));
+
