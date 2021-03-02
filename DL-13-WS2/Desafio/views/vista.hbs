@@ -1,0 +1,45 @@
+<form id="form">
+<h2>Ingrese Producto</h2>
+<label>Nombre</label><br>
+<input type="text" id="title"><br>
+<label>Precio</label><br>
+<input type="text" id="price"><br>
+<label>Foto URL</label><br>
+<input type="text" id="thumbnail"><br>
+<input type="submit" value="Enviar">        
+
+
+{{#if productos}}
+    <table id="table">
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Foto</th>
+        </tr>
+        {{#each productos}}
+        <tr>
+            <td>{{this.id}}</td>
+            <td>{{this.title}}</td>
+            <td>{{this.price}}</td>
+            <td><img src="{{this.thumbnail}}"></td>
+        </tr>
+        {{/each}}
+    </table>
+{{else}}
+    <div id="header">
+        <h2>No se encontraron productos</h2>
+    </div>
+    <div id="prodTable" style="display: none;">
+        <table id="table">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Foto</th>
+            </tr>       
+        </table>
+    </div>
+     
+{{/if}}
+</form>
