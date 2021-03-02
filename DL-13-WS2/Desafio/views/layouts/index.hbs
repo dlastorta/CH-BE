@@ -2,13 +2,21 @@
 <html lang="es">
 
 <head>
-    <title> Desafio 12</title>    
+    <title> Desafio 12</title> 
+    <script src='/socket.io/socket.io.js'></script>
+    <script src='https://momentjs.com/downloads/moment-with-locales.min.js'></script>     
 </head>
 
 <body>
     {{{body}}}
-    <script src='/socket.io/socket.io.js'></script>
-    <script src='/DL-13-WS2/Desafio/public/js/main.js'></script>
+    <h1>Centro de Mensajes</h1>
+    <div id="messages">         
+    </div>
+    <form id='formmessages' onsubmit="return addMessages(this)">
+            <input type="text" id="username" placeholder="Tu Nombre">
+            <input type="text" id="texto" placeholder="Cuentanos Algo..">
+            <input type="submit" id="username" value="Enviar">
+    </form>
     <script>
         const socket = io();
         const form = document.getElementById('form');
@@ -47,14 +55,35 @@
             thumbnail.src = producto.thumbnail;
             thumbnailCell.appendChild(thumbnail);
         });
+
+        let render = (data) =>{
+            var html = data.map((elem,index)=>{
+                    return (`<div>
+                        <strong>${elem.author}</strong>
+                        ${elem.date}:
+                        <em>${elem.text}</em>
+                    </div>`)
+                }).join(" ");
+                document.getElementById('messages').innerHTML = html;    
+        };
+
+        
+        let addMessages = (e) => {
+            var mensaje = {
+                author: document.getElementById('username').value,
+                date: moment().format('DD/MM/YYYY HH:MM:SS'),
+                text: document.getElementById('texto').value
+            }
+            socket.emit('new-message',mensaje);
+            return false;
+        };
+
+        socket.on ('messages', (data)=>{
+            render(data);
+        });
+
     </script>
-        <h1>Centro de Mensajes</h1>
-        <div id="messages"> </div>
-        <form onsubmit="return addMessages(this)">
-                <input type="text" id="username" placeholder="Tu Nombre">
-                <input type="text" id="texto" placeholder="Cuentanos Algo..">
-                <input type="submit" id="username" value="Enviar">
-        </form>
+        
 </body>
 
 </html>
