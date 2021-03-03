@@ -25,17 +25,19 @@ app.use(express.static(__dirname + '/public'));
 
 //productos
 let item = require('./item');
-let idGen = 1;
-let productos = [
-    /*{
-        id:1,
-        title:"ruler",
-        price:"100",
-        thumbnail:"https://cdn3.iconfinder.com/data/icons/education-209/64/ruler-triangle-stationary-school-128.png"
-    }*/
-];
-let messages = [];
+let idGen;
+let messages;
+let productos;
 
+if(typeof idGen === 'undefined'){
+    idGen = 1;
+} 
+if(typeof messages === 'undefined'){
+    messages = [];
+}
+if(typeof productos === 'undefined'){
+    productos = [];
+}
 
 //Routes
 
@@ -56,7 +58,9 @@ io.on('connection', (socket)=>{
     socket.on('new-message',(data)=>{
         messages.push(data);
         fs.writeFile('messages.json',JSON.stringify(messages),(err)=>{
-            if(err){console.log(err)}
+            if(err){
+                console.log(err);
+            }
         });
         io.sockets.emit('messages', messages);
     });
