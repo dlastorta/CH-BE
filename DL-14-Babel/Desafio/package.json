@@ -1,11 +1,30 @@
 {
-  "name": "dl14babel",
+  "name": "14-babel",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon index.js",
+    "buildTs": ".\\node_modules\\.bin\\tsc",
+    "watchTs": ".\\node_modules\\.bin\\tsc -w",
+    "ServerES6ToJS5": ".\\node_modules\\.bin\\babel server.es6.js -o index.js -w",
+    "ServerTStoJS5": ".\\node_modules\\.bin\\tsc server.ts -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.2.0",
+    "handlebars": "^4.7.7",
+    "http": "^0.0.1-security",
+    "jslint": "^0.12.1",
+    "moment": "^2.29.1",
+    "nodemon": "^2.0.7",
+    "socket.io": "^3.1.1",
+    "typescript": "^4.2.2"
+  }
 }

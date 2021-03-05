@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <title> Desafio 13</title> 
+    <script src='/socket.io/socket.io.js'></script>
+    <script src='https://momentjs.com/downloads/moment-with-locales.min.js'></script>     
+</head>
+
+<body>
+    {{{body}}}
+    <h1>Centro de Mensajes</h1>
+    <div id="messages">         
+    </div>
+    <div id="error" style="color:red"></div>
+    <form id='formmessages' onsubmit="return addMessages(this)">
+            <input type="text" id="username" placeholder="Tu Nombre">
+            <input type="text" id="texto" placeholder="Cuentanos Algo..">
+            <input type="submit" id="username" value="Enviar">
+    </form>
+    <script>
+        const socket = io();
+        const form = document.getElementById('form');
+        
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            let title = document.getElementById('title').value;
+            let price = document.getElementById('price').value;
+            let thumbnail = document.getElementById('thumbnail').value;
+            socket.emit('AgregarProducto', {title: title, price: price, thumbnail: thumbnail} )
+            document.getElementById('title').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('thumbnail').value = '';
+        });
+
+        socket.on('ListarProductos', (producto)=>{
+            let header = document.getElementById('header')
+            if(header) { 
+                header.style.display = "none"
+            }
+            document.getElementById('prodTable').style.display = "block"
+            var tableBody = document.getElementById('table').getElementsByTagName('tbody')[0];
+            var newRow = tableBody.insertRow();
+            var IdCell = newRow.insertCell();
+            var IdText = document.createTextNode(producto.id);
+            IdCell.appendChild(IdText);
+            var titleCell = newRow.insertCell();
+            var titleText = document.createTextNode(producto.title);
+            titleCell.appendChild(titleText);
+            var priceCell = newRow.insertCell();
+            var priceText = document.createTextNode(producto.price);
+            priceCell.appendChild(priceText);
+            var thumbnailCell = newRow.insertCell();
+            var thumbnail = document.createElement('img');
+            thumbnail.src = producto.thumbnail;
+            thumbnailCell.appendChild(thumbnail);
+        });
+
+        let render = (data) =>{
+            var html = data.map((elem,index)=>{
+                    return (`<div>
+                        <strong>${elem.author}</strong>
+                        ${elem.date}:
+                        <em>${elem.text}</em>
+                    </div>`)
+                }).join(" ");
+                document.getElementById('messages').innerHTML = html;    
+        };
+
+        
+        let addMessages = (e) => {
+            let author =  document.getElementById('username').value;
+            if(validateEmail(author)){
+                document.getElementById('error').innerHTML = "" ;
+                var mensaje = {
+                author: document.getElementById('username').value,
+                date: moment().format('DD/MM/YYYY HH:MM:SS'),
+                text: document.getElementById('texto').value
+                }
+                socket.emit('new-message',mensaje);
+                return false;
+            } else {
+                document.getElementById('error').innerHTML = "Debe Ingresar un email" ;
+                return false
+            }
+            
+            
+        };
+
+        socket.on ('messages', (data)=>{
+            render(data);
+        });
+
+        function validateEmail(email) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+        }
+
+    </script>
+        
+</body>
+
+</html>
