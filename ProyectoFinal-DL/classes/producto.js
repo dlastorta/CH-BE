@@ -1,14 +1,14 @@
 class Producto {
-    constructor(id, timestamp,nombre,descripcion,codigo,thumbnail,precio,stock,){
+    constructor(id, timestamp, nombre, descripcion, codigo, thumbnail, precio, stock) {
         this.id = id,
         this.timestamp = timestamp,
         this.nombre = nombre,
         this.descripcion = descripcion,
         this.codigo = codigo,
-        this.thumbnail = thumbnail
+        this.thumbnail = thumbnail,
         this.precio = precio,
-        this.stock = stock        
+        this.stock = stock
     }
 }
 
-module.exports = Producto;
+export default Producto;
