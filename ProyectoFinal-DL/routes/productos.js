@@ -5,8 +5,6 @@ const router = express.Router();
 let productoService = require('../service/productoService');
 let adminService = require('../service/adminService');
 
-
-
 //productos
 router.post("/agregar", (req, res) => {
     if (!adminService.isAdmin) {
@@ -34,18 +32,16 @@ router.post("/agregar", (req, res) => {
     }
 });
 
-
 router.get("/listar/:id?", (req, res) => {
     try {
         if (!req.params.id) {
-            res.json(productoService.getProducts());
+            let productos = productoService.getProductos();
+            res.json(productos);
         }
-        let producto = productList.find((producto) => {
-            if (producto.id == req.params.id) {
-                return producto;
-            }
-        });
+
+        let producto = productoService.getProductobyId(req.params.id);
         if (producto) {
+            console.log('existe');
             res.json(producto);
         } else {
             res.json({
@@ -59,21 +55,18 @@ router.get("/listar/:id?", (req, res) => {
     }
 });
 
-
-
 router.put("/actualizar/:id", (req, res) => {
-    if (!isAdmin) {
+    let id = req.params.id;
+    let data = req.body;
+    if (!adminService.isAdmin) {
         res.json({
             error: -1,
             descripcion: `Productos ${req.path} no autorizada`
         });
     } else {
         try {
-            let producto = productList.find(producto => producto.id == req.params.id);
+            let producto = productoService.updateProducto(id, data);
             if (producto) {
-                producto.title = req.body.title;
-                producto.price = req.body.price;
-                producto.thumbnail = req.body.thumbnail;
                 res.json(producto);
             } else {
                 res.json({
@@ -89,18 +82,15 @@ router.put("/actualizar/:id", (req, res) => {
 });
 
 router.delete("/borrar/:id", (req, res) => {
-    if (!isAdmin) {
+    if (!adminService.isAdmin) {
         res.json({
             error: -1,
             descripcion: `Productos ${req.path} no autorizada`
         });
     } else {
         try {
-            let indice = productList.findIndex(producto => producto.id == req.params.id);
-            console.log(indice);
-            if (indice && indice > -1) {
-                let producto = productList[indice]
-                productList.splice(indice, 1);
+            let producto = productoService.borrarProducto(id);
+            if (producto) {
                 res.json(producto);
             } else {
                 res.json({
