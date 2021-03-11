@@ -1,12 +1,21 @@
 const Carrito = require("../entities/carrito");
+const carritoRepository = require('../repositories/carritoRepository');
+
 let idGen = 1;
-let carritos = []
 
 
 let createCarrito = () => {
-    var carrito = new Carrito(idGen,Date.now);
+    let carrito = new Carrito(idGen,Date.now());
     idGen++;
     return carrito;
 }
 
-module.exports = {createCarrito}
+let updateCarrito = (data) => {
+    carritoRepository.writeFile(data)
+}
+
+
+module.exports = {
+    createCarrito,
+    updateCarrito
+}

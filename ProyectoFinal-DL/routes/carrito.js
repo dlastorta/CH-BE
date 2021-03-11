@@ -6,8 +6,6 @@ let productoService = require('../service/productoService');
 let carritoService = require('../service/carritoService');
 let carro = carritoService.createCarrito();
 
-//carrito
-
 router.get("/listar/:id?",(req,res)=>{
     try{
         if(!req.params.id){
@@ -36,6 +34,7 @@ router.post("/agregar/:id_producto", (req,res)=>{
         let producto = productoService.getProductobyId(req.params.id_producto)
         if(producto){
             carro.productos.push(producto);
+            carritoService.updateCarrito(carro);
             res.json(producto);
         }
         else {
@@ -54,6 +53,7 @@ router.delete("/borrar/:id", (req,res)=>{
         if(indice && indice > -1){ 
             let producto = carro.productos[indice]
             carro.productos.splice(indice, 1);
+            carritoService.updateCarrito(carro);
             res.json(producto);
         }
         else {
