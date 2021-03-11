@@ -2,18 +2,16 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 
-let producto = require('../service/productoService');
+let productoService = require('../service/productoService');
 let carritoService = require('../service/carritoService');
-const Carrito = require('../entities/carrito');
-
-    
-//carrito
 let carro = carritoService.createCarrito();
 
-router.get("/listar/:id",(req,res)=>{
+//carrito
+
+router.get("/listar/:id?",(req,res)=>{
     try{
         if(!req.params.id){
-            res.json(carrito);
+            res.json(carro.productos);
         } else {
             let producto = carro.productos.find((producto) => {
                 if(producto.id == req.params.id) {
@@ -35,13 +33,14 @@ router.get("/listar/:id",(req,res)=>{
 
 router.post("/agregar/:id_producto", (req,res)=>{
     try{
-        let producto = productList.find((producto) => {
-            if(producto.id == req.params.id_producto) {
-                return producto;
-            }
-        });
-        carro.productos.push(producto);
-        res.json(`Item agregado: ${JSON.stringify(newProducto)}`);
+        let producto = productoService.getProductobyId(req.params.id_producto)
+        if(producto){
+            carro.productos.push(producto);
+            res.json(producto);
+        }
+        else {
+            res.json({error: 'producto no encontrado'});
+        }
     }
     catch(err){
         console.log(err);

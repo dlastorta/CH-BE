@@ -22,7 +22,7 @@ let getProductobyId = (id) => {
 };
 
 let updateProducto = (id, data) => {
-    let producto = productos.find(producto => producto.id == req.params.id)
+    let producto = productos.find(producto => producto.id == id)
     if (producto) {
         producto.timestamp = Date.now,
         producto.nombre = data.nombre,
@@ -36,9 +36,9 @@ let updateProducto = (id, data) => {
 }
 
 let borrarProducto = (id) => {
-    let indice = productList.findIndex(producto => producto.id == req.params.id);
+    let indice = productos.findIndex(producto => producto.id == id);
     if (indice && indice > -1) {
-        let producto = productList[indice]
+        let producto = productos[indice]
         productos.splice(indice, 1);
         return producto;
     }

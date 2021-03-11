@@ -37,17 +37,17 @@ router.get("/listar/:id?", (req, res) => {
         if (!req.params.id) {
             let productos = productoService.getProductos();
             res.json(productos);
-        }
-
-        let producto = productoService.getProductobyId(req.params.id);
-        if (producto) {
-            console.log('existe');
-            res.json(producto);
         } else {
-            res.json({
-                error: 'producto no encontrado'
-            });
+            let producto = productoService.getProductobyId(req.params.id);
+            if (producto) {
+                res.json(producto);
+            } else {
+                res.json({
+                    error: 'producto no encontrado'
+                });
+            }
         }
+        
     } catch (err) {
         res.json({
             error: err
@@ -56,8 +56,6 @@ router.get("/listar/:id?", (req, res) => {
 });
 
 router.put("/actualizar/:id", (req, res) => {
-    let id = req.params.id;
-    let data = req.body;
     if (!adminService.isAdmin) {
         res.json({
             error: -1,
@@ -65,7 +63,7 @@ router.put("/actualizar/:id", (req, res) => {
         });
     } else {
         try {
-            let producto = productoService.updateProducto(id, data);
+            let producto = productoService.updateProducto(req.params.id, req.body);
             if (producto) {
                 res.json(producto);
             } else {
@@ -89,7 +87,7 @@ router.delete("/borrar/:id", (req, res) => {
         });
     } else {
         try {
-            let producto = productoService.borrarProducto(id);
+            let producto = productoService.borrarProducto(req.params.id);
             if (producto) {
                 res.json(producto);
             } else {
@@ -99,7 +97,7 @@ router.delete("/borrar/:id", (req, res) => {
             }
         } catch (err) {
             res.json({
-                error: "Error actualizando producto " + err
+                error: "Error eliminando producto " + err
             });
         }
     }
