@@ -1,4 +1,4 @@
-class Carro {
+class Carrito {
     constructor(id, timestamp) {
         this.id = id,
         this.timestamp = timestamp,
@@ -6,4 +6,4 @@ class Carro {
     }
 }
 
-export default Carro;
+module.exports = Carrito;

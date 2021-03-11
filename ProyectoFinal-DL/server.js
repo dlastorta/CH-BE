@@ -1,16 +1,11 @@
 const express = require('express');
 const app = express();
-const router = express.Router();
+const bodyParser = require('body-parser');
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ extended: true })); 
 
-let productos = require('./routes/productos');
-let carrito = require('./routes/carritos');
-
-let isAdmin = true;
-let idGenCarro = 1;
-let idGenProducto = 1;
-app.set('isAdmin', isAdmin);
-app.set('idGenCarro', idGenCarro);
-app.set('idGenProducto', idGenProducto);
+let productos = require('./routes/productos.js');
+let carrito = require('./routes/carrito');
 
 //Routes
 app.use('/productos', productos);
