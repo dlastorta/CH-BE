@@ -1,0 +1,55 @@
+use ecommerce
+db.createCollection('mensajes')
+db.mensajes.insert({ "author": "Bron", "mensaje": "Vamos a Comer?", "time": new Date()})
+db.mensajes.insert({ "author": "Arya", "mensaje": "Dale!", "time": new Date()})
+db.mensajes.insert({ "author": "Bron", "mensaje": "Woho! el resto?", "time": new Date()})
+db.mensajes.insert({ "author": "Duque", "mensaje": "Bueno", "time": new Date()})
+db.mensajes.insert({ "author": "Mora", "mensaje": "Adonde vamos?", "time": new Date()})
+db.mensajes.insert({ "author": "Arya", "mensaje": "Vamos a Vrinda!", "time": new Date()})
+db.mensajes.insert({ "author": "Mora", "mensaje": "No me gusta la comida de ahi", "time": new Date()})
+db.mensajes.insert({ "author": "Duque", "mensaje": "A mi me da igual", "time": new Date()})
+db.mensajes.insert({ "author": "Bron", "mensaje": "A mi tambien! solo quiero comer", "time": new Date()})
+db.mensajes.insert({ "author": "Arya", "mensaje": "Bueno vamos", "time": new Date()})
+db.mensajes.insert({ "author": "Mora", "mensaje": "No! quiero pescado!", "time": new Date()})
+db.mensajes.insert({ "author": "Bron", "mensaje": "Bueno vamos a la bajada españa", "time": new Date()})
+db.mensajes.insert({ "author": "Arya", "mensaje": "Bueno", "time": new Date()})
+
+db.items.insert({ "categoria": "Harina", "nombre": "Candeal"})
+db.items.insert({ "categoria": "Harina", "nombre": "Sarraceno")
+db.items.insert({ "categoria": "Harina", "nombre": "Centeno")
+db.items.insert({ "categoria": "Lacteos", "nombre": "Manteca")
+db.items.insert({ "categoria": "Lacteos", "nombre": "Queso Sardo")
+db.items.insert({ "categoria": "Lacteos", "nombre": "Yogur", "stock": 50})
+db.items.insert({ "categoria": "Fiambre", "nombre": "Mortadela", "stock": 30})
+db.items.insert({ "categoria": "Fiambre", "nombre": "Jamon Iberico", "stock": 50})
+
+db.items.update({ "nombre": "Candeal"}, {$set:{ "precio": 150}}, {upsert:true})
+db.items.update({ "nombre": "Sarraceno"}, {$set:{ "precio": 178}}, {upsert:true})
+db.items.update({ "nombre": "Centeno"}, {$set:{ "precio": 150}}, {upsert:true})
+db.items.update({ "nombre": "Manteca"}, {$set:{ "precio": 4000}}, {upsert:true})
+db.items.update({ "nombre": "Queso Sardo"}, {$set:{ "precio": 1300}}, {upsert:true})
+db.items.update({ "nombre": "Yogur"}, {$set:{ "precio": 600}}, {upsert:true})
+db.items.update({ "nombre": "Mortadela"}, {$set:{ "precio": 700}}, {upsert:true})
+db.items.update({ "nombre": "Jamon Iberico"}, {$set:{ "precio": 3200}}, {upsert:true})
+
+db.mensajes.find()
+db.items.find()
+
+db.mensajes.estimatedDocumentCount()
+db.items.estimatedDocumentCount()
+
+db.items.insert({ "categoria": "Fiambre", "nombre": "Surströmming", "stock": 2, "precio": 5000 })
+
+db.items.find({"precio":{ $lt:1000}})
+db.items.find({"precio":[ { $lt:3000},{$gt:1000}] })}
+db.items.find({"precio":{ $gt:3000}})
+
+db.items.find({"precio":{ $lt:1000}},{"nombre":1}).sort({"precio":-1}).limit(1).skip(2)
+
+db.items.update({}, {$set: {"stock": 100}}, false, true)
+db.items.update({"precio":{ $gt:4000}}, {$set:{"stock": 0}}, false,true)
+
+db.items.remove({"precio":{ $lt:1000}})
+
+use admin
+db.createUser({"user":"pepe", password:"asd456","roles":["read","db":"ecommerce"]})

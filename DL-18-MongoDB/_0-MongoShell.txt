@@ -1,0 +1,22 @@
+> use prueba
+switched to db prueba
+> db.items.insert({ "nombre": "fideos", categoria: "Harina", stock: 20})
+WriteResult({ "nInserted" : 1 })
+> db.items.insert({ "nombre": "lacteos", categoria: "Lácteos", stock: 30})
+WriteResult({ "nInserted" : 1 })
+> db.items.insert({ "nombre": "leche", categoria: "Lácteos", stock: 30})
+WriteResult({ "nInserted" : 1 })
+> db.items.insert({ "nombre": "Crema", categoria: "Lácteos", stock: 15})
+WriteResult({ "nInserted" : 1 })
+> db.delete({"nombre": "lacteos"})
+uncaught exception: TypeError: db.delete is not a function :
+@(shell):1:1
+> db.items.delete({"nombre": "lacteos"})
+uncaught exception: TypeError: db.items.delete is not a function :
+@(shell):1:1
+> db.items.remove({"nombre": "lacteos"})
+WriteResult({ "nRemoved" : 1 })
+> db.items.find()
+{ "_id" : ObjectId("6058d1129fd4acee63cfdb83"), "nombre" : "fideos", "categoria" : "Harina", "stock" : 20 }
+{ "_id" : ObjectId("6058d13e9fd4acee63cfdb85"), "nombre" : "leche", "categoria" : "Lácteos", "stock" : 30 }
+{ "_id" : ObjectId("6058d1469fd4acee63cfdb86"), "nombre" : "Crema", "categoria" : "Lácteos", "stock" : 15 }

@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 
 //servicios
-let productoService = require('../service/productoService');
-let adminService = require('../service/adminService');
-
+let productoService = require('../1-service/productoService');
+let adminService = require('../1-service/adminService');
+let isAdmin = adminService.isAdmin;
 //productos
 router.post("/agregar", (req, res) => {
-    if (!adminService.isAdmin) {
+    if (!isAdmin) {
         res.json({
             error: -1,
             descripcion: `Productos ${req.path} no autorizada`
@@ -35,8 +35,12 @@ router.post("/agregar", (req, res) => {
 router.get("/listar/:id?", (req, res) => {
     try {
         if (!req.params.id) {
-            let productos = productoService.getProductos();
-            res.json(productos);
+            productoService.getAllProductos()
+            .then((productos)=>{
+                console.log("repo")
+                console.log(productos)
+                res.json(productos);
+            });
         } else {
             let producto = productoService.getProductobyId(req.params.id);
             if (producto) {

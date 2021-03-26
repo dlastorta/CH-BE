@@ -4,10 +4,11 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true })); 
 
-let productos = require('./routes/productos.js');
-let carrito = require('./routes/carrito');
+
 
 //Routes
+let productos = require('./0-routes/productos.js');
+let carrito = require('./0-routes/carrito');
 app.use('/productos', productos);
 app.use('/carrito', carrito);
 

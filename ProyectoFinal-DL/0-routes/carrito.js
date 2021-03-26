@@ -2,8 +2,8 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 
-let productoService = require('../service/productoService');
-let carritoService = require('../service/carritoService');
+let productoService = require('../1-service/productoService');
+let carritoService = require('../1-service/carritoService');
 let carro = carritoService.createCarrito();
 
 router.get("/listar/:id?",(req,res)=>{

@@ -1,17 +1,20 @@
 const Producto = require("../entities/producto");
-const productoRepository = require('../repositories/productoRepository');
+const productoRepository = require('../2-repositories/productoRepository');
 
-let productos = []
-let idGen = 1;
-let getProductos = () => {
-    return productos;
+let getAllProductos = () => {
+    productoRepository.getAllProductos().then(
+        (productos)=>{
+            console.log("serv")
+            console.log(productos)
+            return productos;
+        }
+    );
 };
 
 let createProducto = (nombre,descripcion,codigo,thumbnail,precio,stock)=>{
-    let newProducto = new Producto(idGen,Date.now(), nombre,descripcion,codigo,thumbnail,precio,stock);
-    idGen++;
-    productos.push(newProducto);
-    productoRepository.writeFile(productos);
+    let newProducto = new Producto(null, Date.now(), nombre,descripcion,codigo,thumbnail,precio,stock);
+    newProducto.id = productoRepository.createProducto(newProducto);
+    console.log(`New Producto with Id: ${newProducto.id}`);
     return newProducto;
 }
 
@@ -51,7 +54,7 @@ let borrarProducto = (id) => {
 module.exports = {
     borrarProducto,
     createProducto,
-    getProductos,
+    getAllProductos,
     getProductobyId,
     updateProducto
 };
