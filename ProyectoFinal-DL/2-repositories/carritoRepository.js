@@ -1,56 +1,70 @@
-const { options } = require('../3-DB/connections/sqlite3.db');
-const knex = require('knex')(options);
-
-knex.schema.hasTable('Carrito').then(function(exists) {
-    if(!exists){
-            knex.schema.createTable('Carrito', table =>{
-            table.increments('id'),
-            table.time('timestamp')
-        })
-    .then(()=> console.log('table Carrito created!'))
-    .catch((err)=>{console.log(err);throw err})
-    .finally(()=>{knex.destroy()});
-    }    
-});
-
-knex.schema.hasTable('ProductosCarrito').then(function(exists) {
-    if(!exists){
-        knex.schema.createTable('ProductosCarrito', table =>{
-            table.uuid('idCarrito'),
-            table.uuid('idProducto')    
-        })
-        .then(()=> console.log('table ProductosCarrito created!'))
-        .catch((err)=>{console.log(err);throw err})
-        .finally(()=>{knex.destroy()})
-    }
-});
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://eeoadmin:3hzL2&66cT#NaJg@coderhouse.fclea.mongodb.net/eCommerce?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 let createCarrito = () =>{
-    knex('Carrito')
-        .insert({
-            timestamp: Date.now()
+    client.connect(err => {
+        const collection = client.db("eCommerce").collection("Carritos");
+        collection.insertOne({
+            timestamp: Date.now,
+            productos: []
         })
-}
+        client.close();
+      });
+      
+};
 
-
-const fs = require("fs");
-const file = "./storage/carritos.json";
-
-let writeFile = (data) =>{
-    fs.writeFile(file,JSON.stringify(data),(err)=>{
-        if(err){
-            console.log(err)
-        } else {
-            console.log('Carrito Guardado');
-        }
-        
-    });
-}
-
+let getCarrito = (id) =>{
+    client.connect(err => {
+        const collection = client.db("eCommerce").collection("Carritos");
+        collection.findOne(
+            {_id: id},
+            (err, result)=>{
+                if(err) throw err;
+                return result;                
+            }           
+        )
+        client.close();
+      });  
+};
+let updateCarrito = (carrito) =>{
+    client.connect(err => {
+        const collection = client.db("eCommerce").collection("Carritos");
+        collection.updateOne(
+            {_id: carrito.id},
+            { $set:{
+                timestamp: Date.now,
+                productos: carrito.productos
+                }
+            },
+            (err)=>{
+                if(err) throw err;
+                return carrito;                
+            }           
+        )
+        client.close();
+      });    
+};
+let deleteCarrito = () =>{
+    client.connect(err => {
+        const collection = client.db("eCommerce").collection("Carritos");
+        collection.deleteOne(
+            {_id: carrito.id},
+            (err)=>{
+                if(err) throw err;
+                return carrito;                
+            }           
+        )
+        client.close();
+      });
+};
 
 
 module.exports = {
     createCarrito,
-    writeFile
+    getCarrito,
+    updateCarrito,
+    deleteCarrito
+    
 }

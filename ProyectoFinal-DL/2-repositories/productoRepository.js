@@ -1,67 +1,80 @@
-const { options } = require('../3-DB/connections/sqlite3.db');
-const knex = require('knex')(options);
-const Producto = require('../entities/producto');
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://eeoadmin:3hzL2&66cT#NaJg@coderhouse.fclea.mongodb.net/eCommerce?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-knex.schema.hasTable('Productos').then(function(exists) {
-    if(!exists){
-        knex.schema.createTable('Productos', table =>{
-            table.increments('id'),
-            table.time('timestamp'),
-            table.string('nombre'),
-            table.string('descripcion'),
-            table.string('codigo'),
-            table.string('thumbnail'),
-            table.float('precio'),
-            table.integer('stock')
+
+let createProducto = (newProducto) =>{
+    client.connect(err => {
+        const collection = client.db("eCommerce").collection("Productos");
+        collection.insertOne({
+            timestamp : Date.now,
+            nombre : newProducto.nombre,
+            descripcion : newProducto.descripcion,
+            codigo : newProducto.codigo,
+            thumbnail : newProducto.thumbnail,
+            precio : newProducto.precio,
+            stock : newProducto.stock
         })
-        .then(()=> console.log('table Producto created!'))
-        .catch((err)=>{console.log(err); throw err})
-        .finally(()=>{knex.destroy()})
-    }
-});
-
-let createProducto = (producto) => {
-    knex.insert(
-        {
-            timestamp: producto.timestamp,
-            nombre: producto.nombre,
-            descripcion: producto.descripcion,
-            codigo: producto.codigo,
-            thumbnail: producto.thumbnail,
-            precio: producto.precio,
-            stock: producto.stock
-        }
-    )
-    .returning('id')
-    .into('Productos')
-    .then(
-        (id) => {
-            return id;
-        }
-    )    
-}
-
-let getAllProductos = () => {
-    let productos = [];
-    knex.from('Productos').select("*")
-    .then((rows)=>{
-        for (row of rows){
-            productos.push(
-                new Producto(row['id'],row['timestamp'],row['nombre'],row['descripcion'],row['codigo'],row['thumbnail'],row['precio'],row['stock'])
-            );
-        }
-        return productos;
-    })
-    .catch((err)=> {
-         console.log(err);
-         throw err
-        })
-    .finally(() => 
-        knex.destroy()
-    )
+        client.close();
+      });
+      
 };
+
+let getProducto = (id) =>{
+    client.connect(err => {
+        const collection = client.db("eCommerce").collection("Productos");
+        collection.findOne(
+            {_id: id},
+            (err, result)=>{
+                if(err) throw err;
+                return result;                
+            }           
+        )
+        client.close();
+      });  
+};
+let updateProducto = (producto) =>{
+    client.connect(err => {
+        const collection = client.db("eCommerce").collection("Productos");
+        collection.updateOne(
+            {_id: producto.id},
+            { $set:{
+                timestamp : Date.now,
+                nombre : producto.nombre,
+                descripcion : producto.descripcion,
+                codigo : producto.codigo,
+                thumbnail : producto.thumbnail,
+                precio : producto.precio,
+                stock : producto.stock
+                }
+            },
+            (err)=>{
+                if(err) throw err;
+                return producto;                
+            }           
+        )
+        client.close();
+      });    
+};
+let deleteProducto = () =>{
+    client.connect(err => {
+        const collection = client.db("eCommerce").collection("Productos");
+        collection.deleteOne(
+            {_id: producto.id},
+            (err)=>{
+                if(err) throw err;
+                return producto;                
+            }           
+        )
+        client.close();
+      });
+};
+
 
 module.exports = {
     createProducto,
-    getAllProductos
+    getProducto,
+    updateProducto,
+    deleteProducto
+    
 }
