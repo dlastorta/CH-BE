@@ -1,22 +1,15 @@
 const Producto = require("../entities/producto");
 const productoRepository = require('../2-repositories/productoRepository');
 
-let getAllProductos = () => {
-    productoRepository.getAllProductos().then(
-        (productos)=>{
-            console.log("serv")
-            console.log(productos)
-            return productos;
-        }
-    );
-};
-
-let createProducto = (nombre,descripcion,codigo,thumbnail,precio,stock)=>{
-    let newProducto = new Producto(null, Date.now(), nombre,descripcion,codigo,thumbnail,precio,stock);
+let createProducto = (newProducto)=>{
     newProducto.id = productoRepository.createProducto(newProducto);
     console.log(`New Producto with Id: ${newProducto.id}`);
     return newProducto;
 }
+
+let getAllProductos = () => {
+    return ProductoRepository.getProductos({},{});
+};
 
 let getProductobyId = (id) => {
     return productos.find((producto) => {
@@ -25,6 +18,10 @@ let getProductobyId = (id) => {
         }
     })
 };
+
+
+
+
 
 let updateProducto = (id, data) => {
     let producto = productos.find(producto => producto.id == id)

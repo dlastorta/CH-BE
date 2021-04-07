@@ -3,7 +3,15 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true })); 
+const mongoose = require('mongoose');
 
+
+DBUP();
+function DBUP() {
+    const uri = "mongodb+srv://eeoadmin:D722EMPBzMtgG3c@coderhouse.fclea.mongodb.net/eCommerce?retryWrites=true&w=majority";
+    mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    console.log('DB UP');
+}
 
 
 //Routes

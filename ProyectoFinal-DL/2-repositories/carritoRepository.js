@@ -1,65 +1,27 @@
-const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://eeoadmin:3hzL2&66cT#NaJg@coderhouse.fclea.mongodb.net/eCommerce?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const model = require('../models/carrito');
 
-
-let createCarrito = () =>{
-    client.connect(err => {
-        const collection = client.db("eCommerce").collection("Carritos");
-        collection.insertOne({
-            timestamp: Date.now,
-            productos: []
-        })
-        client.close();
-      });
-      
+let createCarrito = async () =>{
+    console.log('c rep');
+    const carritoSaveModel = new model.carritos();
+    let carritoSave = await carritoSaveModel.save();
+    return carritoSave;
 };
 
 let getCarrito = (id) =>{
-    client.connect(err => {
-        const collection = client.db("eCommerce").collection("Carritos");
-        collection.findOne(
-            {_id: id},
-            (err, result)=>{
-                if(err) throw err;
-                return result;                
-            }           
-        )
-        client.close();
-      });  
+    let carrito =  model.carritos.find({_id: id})
+    return carrito;
 };
 let updateCarrito = (carrito) =>{
-    client.connect(err => {
-        const collection = client.db("eCommerce").collection("Carritos");
-        collection.updateOne(
-            {_id: carrito.id},
-            { $set:{
-                timestamp: Date.now,
-                productos: carrito.productos
-                }
-            },
-            (err)=>{
-                if(err) throw err;
-                return carrito;                
-            }           
-        )
-        client.close();
-      });    
+        let carritoUpdate =  model.usuarios.updateOne( 
+            {_id: carrito.id}, {
+            $set:{
+                timestamp: Date.now
+            }
+        })
 };
-let deleteCarrito = () =>{
-    client.connect(err => {
-        const collection = client.db("eCommerce").collection("Carritos");
-        collection.deleteOne(
-            {_id: carrito.id},
-            (err)=>{
-                if(err) throw err;
-                return carrito;                
-            }           
-        )
-        client.close();
-      });
+let deleteCarrito = (id) =>{
+    let carritoDelete =  model.usuarios.deleteOne({_id: id})    
 };
-
 
 module.exports = {
     createCarrito,

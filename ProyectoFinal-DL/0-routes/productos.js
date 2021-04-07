@@ -4,6 +4,7 @@ const router = express.Router();
 //servicios
 let productoService = require('../1-service/productoService');
 let adminService = require('../1-service/adminService');
+let Producto = require('../entities/producto')
 let isAdmin = adminService.isAdmin;
 //productos
 router.post("/agregar", (req, res) => {
@@ -14,19 +15,20 @@ router.post("/agregar", (req, res) => {
         });
     } else {
         try {
-            let newProducto = productoService.createProducto(
+            let newProducto = new Producto(
+                Date.now(), 
                 req.body.nombre,
                 req.body.descripcion,
                 req.body.codigo,
                 req.body.thumbnail,
                 req.body.precio,
-                req.body.stock
-            );
-            res.json(newProducto);
+                req.body.stock);
+            let producto = productoService.createProducto(newProducto);
+            res.json(producto);
         } catch (err) {
             console.log(err);
             res.json({
-                error: "Error salvando producto"
+                error: "Error creando producto"
             });
         }
     }
