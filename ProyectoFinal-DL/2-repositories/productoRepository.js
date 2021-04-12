@@ -10,12 +10,11 @@ let getProductos = async (filter, filterValue) =>{
     if(filter !== null || filter  === 'undefined'){
         query[filter] = filterValue;
     }
+    console.log(query);
     return await model.productos.find(query, (err, productos)=>{
         if(err){
             throw err;            
-        }
-        console.log('repo');
-        console.log(productos);
+        }       
     });
 };
 let updateProducto = async (id, data) =>{

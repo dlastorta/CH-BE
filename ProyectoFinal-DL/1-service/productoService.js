@@ -19,8 +19,8 @@ let getAllProductos = async () => {
     return await productoRepository.getProductos();    
 };
 
-let getProductobyId = async (id) => {
-    return await productoRepository.getProductos("_id",id);
+let getProductobyfilter = async (filter,filtervalue) => {
+    return await productoRepository.getProductos(filter,filtervalue);
 };
 
 let deleteProducto = async (id) => {
@@ -31,6 +31,6 @@ module.exports = {
     createProducto,
     deleteProducto,
     getAllProductos,
-    getProductobyId,
+    getProductobyfilter,
     updateProducto
 };

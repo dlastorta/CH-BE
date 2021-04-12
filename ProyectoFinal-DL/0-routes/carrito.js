@@ -4,12 +4,13 @@ const router = express.Router();
 
 let productoService = require('../1-service/productoService');
 let carritoService = require('../1-service/carritoService');
-let carro = {};
+let carrito = {};
 
 router.post("/crear",(req,res)=>{
     try{
         
         carritoService.createCarrito().then(carro => {
+            carrito = carro;
             res.json(carro)
         });
         
@@ -21,15 +22,18 @@ router.post("/crear",(req,res)=>{
 
 router.post("/agregar/:id_producto", (req,res)=>{
     try{
-        let producto = productoService.getProductobyId(req.params.id_producto)
-        if(producto){
-            carro.productos.push(producto);
-            carritoService.updateCarrito(carro);
-            res.json(producto);
-        }
-        else {
-            res.json({error: 'producto no encontrado'});
-        }
+        let producto = productoService.getProductobyId(req.params.id_producto).then(
+            (producto)=>{
+                if(producto !== null){
+                    carrito.producto.push(producto);
+                    carritoService.updateCarrito(carrito);
+                    res.json(producto);
+                }
+                else {
+                    res.json({error: 'producto no encontrado'});
+                }
+            }
+        )
     }
     catch(err){
         console.log(err);
@@ -40,9 +44,9 @@ router.post("/agregar/:id_producto", (req,res)=>{
 router.get("/listar/:id?",(req,res)=>{
     try{
         if(!req.params.id){
-            res.json(carro.productos);
+            res.json(carrito.productos);
         } else {
-            let producto = carro.productos.find((producto) => {
+            let producto = carrito.productos.find((producto) => {
                 if(producto.id == req.params.id) {
                     return producto;
                 }
@@ -62,11 +66,11 @@ router.get("/listar/:id?",(req,res)=>{
 
 router.delete("/borrar/producto/:id", (req,res)=>{
     try{
-        let indice = carro.productos.findIndex(producto => producto.id == req.params.id );
+        let indice = carrito.productos.findIndex(producto => producto.id == req.params.id );
         if(indice && indice > -1){ 
-            let producto = carro.productos[indice]
-            carro.productos.splice(indice, 1);
-            carritoService.updateCarrito(carro);
+            let producto = carrito.productos[indice]
+            carrito.productos.splice(indice, 1);
+            carritoService.updateCarrito(carrito);
             res.json(producto);
         }
         else {
@@ -80,7 +84,7 @@ router.delete("/borrar/producto/:id", (req,res)=>{
 
 router.delete("/borrar/:id", (req,res)=>{
     try {
-        carritoService.deleteCarrito(carro);
+        carritoService.deleteCarrito(carrito);
         res.json(producto);
     }
     catch(err){

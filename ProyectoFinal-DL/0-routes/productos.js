@@ -44,13 +44,35 @@ router.get("/listar/:id?", (req, res) => {
                 res.json(productos);
             });
         } else {
-            console.log("id")
-            console.log(req.params.id)
-            productoService.getProductobyId(req.params.id)
+            productoService.getProductobyfilter("_id",req.params.id)
             .then((producto)=>{
                 if (producto) {
-                    console.log("ruta");
-                    console.log(producto)
+                    res.json(producto);
+                } else {
+                    res.json({
+                        error: 'Producto no encontrado'
+                    });
+                }
+            });            
+        }
+    } catch (err) {
+        res.json({
+            error: err
+        });
+    }
+});
+
+router.get("/listar/:id?/filtro/:filter?", (req, res) => {
+    try {
+        if (!req.params.id) {
+            productoService.getAllProductos()
+            .then((productos)=>{                
+                res.json(productos);
+            });
+        } else {
+            productoService.getProductobyfilter(req.params.filter,req.params.id)
+            .then((producto)=>{
+                if (producto) {
                     res.json(producto);
                 } else {
                     res.json({
