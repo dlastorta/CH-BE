@@ -8,8 +8,10 @@ let carro = {};
 
 router.post("/crear",(req,res)=>{
     try{
-        console.log('crear');
-        carro = carritoService.createCarrito();
+        
+        carritoService.createCarrito().then(carro => {
+            res.json(carro)
+        });
         
     }
     catch(err){

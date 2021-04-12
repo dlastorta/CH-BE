@@ -2,9 +2,7 @@ const Carrito = require("../entities/carrito");
 const carritoRepository = require('../2-repositories/carritoRepository');
 
 let createCarrito = async () => {
-    console.log('c serv');
-    let carrito = carritoRepository.createCarrito();
-    return carrito;
+    return await carritoRepository.createCarrito();    
 }
 
 let updateCarrito = (data) => {

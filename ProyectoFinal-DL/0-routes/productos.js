@@ -23,8 +23,10 @@ router.post("/agregar", (req, res) => {
                 req.body.thumbnail,
                 req.body.precio,
                 req.body.stock);
-            let producto = productoService.createProducto(newProducto);
-            res.json(producto);
+            productoService.createProducto(newProducto).then((producto)=>{
+                res.json(producto)
+            });
+            
         } catch (err) {
             console.log(err);
             res.json({
@@ -38,22 +40,25 @@ router.get("/listar/:id?", (req, res) => {
     try {
         if (!req.params.id) {
             productoService.getAllProductos()
-            .then((productos)=>{
-                console.log("repo")
-                console.log(productos)
+            .then((productos)=>{                
                 res.json(productos);
             });
         } else {
-            let producto = productoService.getProductobyId(req.params.id);
-            if (producto) {
-                res.json(producto);
-            } else {
-                res.json({
-                    error: 'producto no encontrado'
-                });
-            }
+            console.log("id")
+            console.log(req.params.id)
+            productoService.getProductobyId(req.params.id)
+            .then((producto)=>{
+                if (producto) {
+                    console.log("ruta");
+                    console.log(producto)
+                    res.json(producto);
+                } else {
+                    res.json({
+                        error: 'Producto no encontrado'
+                    });
+                }
+            });            
         }
-        
     } catch (err) {
         res.json({
             error: err
@@ -69,14 +74,18 @@ router.put("/actualizar/:id", (req, res) => {
         });
     } else {
         try {
-            let producto = productoService.updateProducto(req.params.id, req.body);
-            if (producto) {
-                res.json(producto);
-            } else {
-                res.json({
-                    error: 'Producto no encontrado'
-                });
-            }
+            productoService.updateProducto(req.params.id, req.body)
+            .then((producto)=>{
+                if (producto) {
+                    console.log("ruta");
+                    console.log(producto)
+                    res.json(producto);
+                } else {
+                    res.json({
+                        error: 'Producto no encontrado'
+                    });
+                }
+            });
         } catch (err) {
             res.json({
                 error: "Error actualizando producto " + err
@@ -93,17 +102,19 @@ router.delete("/borrar/:id", (req, res) => {
         });
     } else {
         try {
-            let producto = productoService.borrarProducto(req.params.id);
-            if (producto) {
-                res.json(producto);
-            } else {
-                res.json({
-                    error: 'Producto no encontrado'
-                });
-            }
+            productoService.deleteProducto(req.params.id)
+            .then((producto)=>{
+                if (producto) {
+                    res.json(producto);
+                } else {
+                    res.json({
+                        error: 'Producto no encontrado'
+                    });
+                }
+            });
         } catch (err) {
             res.json({
-                error: "Error eliminando producto " + err
+                error: "Error actualizando producto " + err
             });
         }
     }

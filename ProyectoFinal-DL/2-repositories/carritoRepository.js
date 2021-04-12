@@ -1,8 +1,7 @@
 const model = require('../models/carrito');
 
 let createCarrito = async () =>{
-    console.log('c rep');
-    const carritoSaveModel = new model.carritos();
+    const carritoSaveModel = new model.carritos({timestamp: Date.now()});
     let carritoSave = await carritoSaveModel.save();
     return carritoSave;
 };
