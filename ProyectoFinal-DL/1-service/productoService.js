@@ -2,8 +2,8 @@ const Producto = require("../entities/producto");
 const productoRepository = require('../2-repositories/productoRepository');
 
 let createProducto = (newProducto)=>{
-    newProducto.id = productoRepository.createProducto(newProducto);
-    console.log(`New Producto with Id: ${newProducto.id}`);
+    newProducto = productoRepository.createProducto(newProducto);
+    console.log(`Create New Producto: ${newProducto}`);
     return newProducto;
 }
 
