@@ -35,6 +35,7 @@ app.use(express.static(__dirname + '/public'));
 
 //productos
 let msgIdGen;
+let msgAutores;
 let messages;
 let productos;
 
@@ -43,6 +44,9 @@ if(typeof msgIdGen === 'undefined'){
 } 
 if(typeof messages === 'undefined'){
     messages = [];
+}
+if(typeof msgAutores === 'undefined'){
+    msgAutores = []
 }
 
 //Routes
@@ -56,7 +60,13 @@ io.on('connection', (socket)=>{
     socket.emit('messages', messages);
 
     socket.on('new-message',(data)=>{
-        console.log(data);
+        if(typeof msgAutores[data.autor.email] === 'undefined'){
+            msgAutores[data.autor.email]=0;           
+        } else {
+            msgAutores[data.autor.email]++;
+        }
+        
+        data.id=msgAutores[data.autor.email];
         data.mensaje.id = msgIdGen;
         msgIdGen++
         messages.push(data);
@@ -65,30 +75,28 @@ io.on('connection', (socket)=>{
                 console.log(`Error escribienjdo archivo. error: ${err}`);
             }
         });
+        
         let rawData = fs.readFileSync('messages.json');
         let msgs = JSON.parse(rawData);
 
-        const author = new schema.Entity('autor');
+        const author = new schema.Entity('autor',{},{idAttribute:'email'});
         const msg = new schema.Entity('mensaje');
-        const article = new schema.Entity('articles',{
+        const post = new schema.Entity('post',{
             autor: author,
             mensajes:[msg]
-        });
-        const posts = new schema.Entity('posts',{
-            posts: [article]
-        });
+        });        
         
-        console.log("original");
+        console.log("original L");
         console.log(JSON.stringify(msgs).length);
 
-        const normalizedPosts = normalize(msgs,posts)
+        const normalizedPosts = normalize(msgs,post)
         
-        console.log("normalized");
+        console.log("normalized L");
         console.log(JSON.stringify(normalizedPosts).length);
         console.log("print normalized");
         print(normalizedPosts)
-        //console.log("normalized Post");
-        //console.log(JSON.stringify(normalizedPosts));
+        console.log("normalized Post");
+        console.log(JSON.stringify(normalizedPosts));
 
         let compresion = ((JSON.stringify(normalizedPosts).length / JSON.stringify(msgs).length ) * 100) + "%"
         console.log(`la compresion es ${compresion}%`);

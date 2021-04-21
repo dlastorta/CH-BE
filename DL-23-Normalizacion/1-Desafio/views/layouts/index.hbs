@@ -13,7 +13,7 @@
     <h1 id="compresion"></h1>
     <div id="error" style="color:red"></div>
     <form id='formmessages' onsubmit="return addMessages(this)">
-            <input type="text" id="id" placeholder="Tu Email"><br>
+            <input type="text" id="email" placeholder="Tu Email"><br>
             <input type="text" id="nombre" placeholder="Tu Nombre"><br>
             <input type="text" id="apellido" placeholder="Tu Apellido"><br>
             <input type="text" id="edad" placeholder="Tu Edad"><br>
@@ -37,7 +37,7 @@
             var html = data.map((elem,index)=>{
                     console.log(elem);
                     return (`<div>
-                        <strong>${elem.autor.id}</strong>
+                        <strong>${elem.autor.email}</strong>
                         ${elem.mensaje.date}:
                         <em>${elem.mensaje.texto}</em>
                     </div>`)
@@ -48,11 +48,11 @@
 
         
         let addMessages = (e) => {
-            let id =  document.getElementById('id').value;
-            if(validateEmail(id)){
+            let email =  document.getElementById('email').value;
+            if(validateEmail(email)){
                 document.getElementById('error').innerHTML = "" ;
                 var autor = {
-                id: document.getElementById('id').value,
+                email: document.getElementById('email').value,
                 nombre: document.getElementById('nombre').value,
                 apellido: document.getElementById('apellido').value,
                 edad: document.getElementById('edad').value,
