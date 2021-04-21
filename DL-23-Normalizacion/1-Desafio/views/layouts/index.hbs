@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <title> Desafio 23</title> 
+    <script src='/socket.io/socket.io.js'></script>
+    <script src='https://momentjs.com/downloads/moment-with-locales.min.js'></script>     
+</head>
+
+<body>
+    {{{body}}}
+    <h1>Centro de Mensajes</h1>
+    <h1 id="compresion"></h1>
+    <div id="error" style="color:red"></div>
+    <form id='formmessages' onsubmit="return addMessages(this)">
+            <input type="text" id="id" placeholder="Tu Email"><br>
+            <input type="text" id="nombre" placeholder="Tu Nombre"><br>
+            <input type="text" id="apellido" placeholder="Tu Apellido"><br>
+            <input type="text" id="edad" placeholder="Tu Edad"><br>
+            <input type="text" id="alias" placeholder="Tu Alias"><br>
+            <input type="text" id="avatar" placeholder="Tu Avatar"><br>
+            <input type="text" id="texto" placeholder="Cuentanos Algo.."><br>
+            <input type="submit" id="username" value="Enviar">
+    </form>
+    <div id="messages">         
+    </div>
+    <script>
+        const socket = io();
+        const form = document.getElementById('form');
+        
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();            
+        });
+
+        let renderNewMessage = (data) =>{
+            //document.getElementById('compresion').innerHTML = data.compresion;  
+            var html = data.map((elem,index)=>{
+                    console.log(elem);
+                    return (`<div>
+                        <strong>${elem.autor.id}</strong>
+                        ${elem.mensaje.date}:
+                        <em>${elem.mensaje.texto}</em>
+                    </div>`)
+                }).join(" ");
+                document.getElementById('messages').innerHTML = html;  
+
+        };
+
+        
+        let addMessages = (e) => {
+            let id =  document.getElementById('id').value;
+            if(validateEmail(id)){
+                document.getElementById('error').innerHTML = "" ;
+                var autor = {
+                id: document.getElementById('id').value,
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                edad: document.getElementById('edad').value,
+                alias: document.getElementById('alias').value,
+                avatar: document.getElementById('avatar').value                
+                }
+                var mensaje = {
+                    autor: autor,
+                    mensaje: {
+                        texto: document.getElementById('texto').value,                    
+                        date: moment().format('DD/MM/YYYY HH:MM:SS'),
+                    }
+                    
+                }
+                socket.emit('new-message',mensaje);
+                return false;
+            } else {
+                document.getElementById('error').innerHTML = "Debe Ingresar un email" ;
+                return false
+            }
+            
+            
+        };
+
+        socket.on ('messages', (data)=>{
+            renderNewMessage(data);
+        });
+
+        function validateEmail(email) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+        }
+
+    </script>
+        
+</body>
+
+</html>

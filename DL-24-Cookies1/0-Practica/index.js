@@ -70,6 +70,6 @@ app.get('/content',auth,(req,res)=>{
 
 app.get('/logout',(req,res)=>{
     res.session.destroy();
-    res.send("logout!")
+    res.send("logout!");
 });
 
