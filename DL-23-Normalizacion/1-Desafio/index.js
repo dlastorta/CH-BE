@@ -36,14 +36,14 @@ app.use(express.static(__dirname + '/public'));
 //productos
 let msgIdGen;
 let msgAutores;
-let messages;
+let posts;
 let productos;
 
 if(typeof msgIdGen === 'undefined'){
     msgIdGen = 1;
 } 
-if(typeof messages === 'undefined'){
-    messages = [];
+if(typeof posts === 'undefined'){
+    posts = [];
 }
 if(typeof msgAutores === 'undefined'){
     msgAutores = []
@@ -57,50 +57,48 @@ app.get('/',(req,res)=>{
 
 //Events
 io.on('connection', (socket)=>{
-    socket.emit('messages', messages);
+    socket.emit('messages', posts);
 
-    socket.on('new-message',(data)=>{
-        if(typeof msgAutores[data.autor.email] === 'undefined'){
-            msgAutores[data.autor.email]=0;           
+    socket.on('new-message',(newPost)=>{
+        if(typeof msgAutores[newPost.author.email] === 'undefined'){
+            msgAutores[newPost.author.email]=0;           
         } else {
-            msgAutores[data.autor.email]++;
+            msgAutores[newPost.author.email]++;
         }
         
-        data.id=msgAutores[data.autor.email];
-        data.mensaje.id = msgIdGen;
+        newPost.id=msgAutores[newPost.author.email];
+        console.log(newPost);
+        newPost.message.id = msgIdGen;
+        posts.id = msgIdGen;
         msgIdGen++
-        messages.push(data);
-        fs.writeFileSync('messages.json',JSON.stringify(messages),(err)=>{
+        posts.push(newPost);
+        fs.writeFileSync('messages.json',JSON.stringify({posts:posts}),(err)=>{
             if(err){
                 console.log(`Error escribienjdo archivo. error: ${err}`);
             }
         });
         
         let rawData = fs.readFileSync('messages.json');
-        let msgs = JSON.parse(rawData);
-
-        const author = new schema.Entity('autor',{},{idAttribute:'email'});
-        const msg = new schema.Entity('mensaje');
-        const post = new schema.Entity('post',{
-            autor: author,
-            mensajes:[msg]
-        });        
+        let parsedData = JSON.parse(rawData);
         
-        console.log("original L");
-        console.log(JSON.stringify(msgs).length);
-
-        const normalizedPosts = normalize(msgs,post)
-        
-        console.log("normalized L");
-        console.log(JSON.stringify(normalizedPosts).length);
-        console.log("print normalized");
-        print(normalizedPosts)
-        console.log("normalized Post");
-        console.log(JSON.stringify(normalizedPosts));
-
-        let compresion = ((JSON.stringify(normalizedPosts).length / JSON.stringify(msgs).length ) * 100) + "%"
-        console.log(`la compresion es ${compresion}%`);
-        io.sockets.emit('messages', msgs);
+        const autor = new schema.Entity('author',{},{idAttribute:'email'});
+        const msg = new schema.Entity('message',{},{idAttribute:'id'});
+        const post = new schema.Entity('posts',
+        {
+            posts: [{
+                    author: autor,
+                    message:[msg]
+                }]            
+        },{idAttribute:'id'});        
+        const normalizedPosts = normalize(parsedData,post)
+        let compresion = ((JSON.stringify(normalizedPosts).length / JSON.stringify(parsedData).length ) * 100) + "%"
+        let feData = {
+            posts: parsedData.posts,
+            compresion: compresion,
+            parsedData: parsedData,
+            normalizedPosts: normalizedPosts
+        }
+        io.sockets.emit('messages', feData);
     });
 });
 

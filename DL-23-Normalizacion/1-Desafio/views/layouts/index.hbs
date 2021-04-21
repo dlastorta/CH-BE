@@ -33,23 +33,25 @@
         });
 
         let renderNewMessage = (data) =>{
-            //document.getElementById('compresion').innerHTML = data.compresion;  
-            var html = data.map((elem,index)=>{
-                    console.log(elem);
+            if(data.length !== 0){
+                document.getElementById('compresion').innerHTML = `La compresion es ${data.compresion}` ;  
+                console.log('Normalized Posts');
+                console.log(data.normalizedPosts);
+                var html = data.posts.map((elem,index)=>{
                     return (`<div>
-                        <strong>${elem.autor.email}</strong>
-                        ${elem.mensaje.date}:
-                        <em>${elem.mensaje.texto}</em>
+                        <strong>${elem.author.email}</strong>
+                        ${elem.message.date}:
+                        <em>${elem.message.texto}</em>
                     </div>`)
                 }).join(" ");
                 document.getElementById('messages').innerHTML = html;  
-
+            }            
         };
 
         
         let addMessages = (e) => {
             let email =  document.getElementById('email').value;
-            if(validateEmail(email)){
+            //if(validateEmail(email)){
                 document.getElementById('error').innerHTML = "" ;
                 var autor = {
                 email: document.getElementById('email').value,
@@ -59,22 +61,20 @@
                 alias: document.getElementById('alias').value,
                 avatar: document.getElementById('avatar').value                
                 }
-                var mensaje = {
-                    autor: autor,
-                    mensaje: {
+                var post = {
+                    author: autor,
+                    message: {
                         texto: document.getElementById('texto').value,                    
                         date: moment().format('DD/MM/YYYY HH:MM:SS'),
                     }
                     
                 }
-                socket.emit('new-message',mensaje);
+                socket.emit('new-message',post);
                 return false;
-            } else {
+            /*} else {
                 document.getElementById('error').innerHTML = "Debe Ingresar un email" ;
                 return false
-            }
-            
-            
+            }*/
         };
 
         socket.on ('messages', (data)=>{
