@@ -35,8 +35,11 @@
         let renderNewMessage = (data) =>{
             if(data.length !== 0){
                 document.getElementById('compresion').innerHTML = `La compresion es ${data.compresion}` ;  
+                console.log('parsedData');
+                console.log(data.parsedData);
                 console.log('Normalized Posts');
                 console.log(data.normalizedPosts);
+                
                 var html = data.posts.map((elem,index)=>{
                     return (`<div>
                         <strong>${elem.author.email}</strong>

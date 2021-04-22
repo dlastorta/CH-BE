@@ -11,6 +11,7 @@ const normalizr = require('normalizr');
 const normalize = normalizr.normalize;
 const schema = normalizr.schema;
 
+const { v4: uuidv4 } = require('uuid');
 const util = require('util');
 print = (objeto) =>{
     console.log(util.inspect(objeto,false,12,true));
@@ -36,17 +37,21 @@ app.use(express.static(__dirname + '/public'));
 //productos
 let msgIdGen;
 let msgAutores;
-let posts;
+let users;
+let items;
 let productos;
 
 if(typeof msgIdGen === 'undefined'){
     msgIdGen = 1;
 } 
-if(typeof posts === 'undefined'){
-    posts = [];
+if(typeof items === 'undefined'){
+    items = [];
 }
 if(typeof msgAutores === 'undefined'){
     msgAutores = []
+}
+if(typeof users === 'undefined'){
+    users = []
 }
 
 //Routes
@@ -57,7 +62,7 @@ app.get('/',(req,res)=>{
 
 //Events
 io.on('connection', (socket)=>{
-    socket.emit('messages', posts);
+    socket.emit('messages', items);
 
     socket.on('new-message',(newPost)=>{
         if(typeof msgAutores[newPost.author.email] === 'undefined'){
@@ -65,14 +70,20 @@ io.on('connection', (socket)=>{
         } else {
             msgAutores[newPost.author.email]++;
         }
+        debugger;
+        if(!users.includes(newPost.author.email)){
+            users.push(newPost.author.email)
+            newPost.author.uId = users.length+1
+        } else {
+            newPost.author.uId = users.indexOf(newPost.author.email)
+        }
         
-        newPost.id=msgAutores[newPost.author.email];
-        console.log(newPost);
-        newPost.message.id = msgIdGen;
-        posts.id = msgIdGen;
+        newPost.pId="p"+msgAutores[newPost.author.email];
+        newPost.message.mId = "m"+msgIdGen;
+        newPost.message.author = newPost.author;
         msgIdGen++
-        posts.push(newPost);
-        fs.writeFileSync('messages.json',JSON.stringify({posts:posts}),(err)=>{
+        items.push(newPost);
+        fs.writeFileSync('messages.json',JSON.stringify({posts: items}),(err)=>{
             if(err){
                 console.log(`Error escribienjdo archivo. error: ${err}`);
             }
@@ -81,16 +92,18 @@ io.on('connection', (socket)=>{
         let rawData = fs.readFileSync('messages.json');
         let parsedData = JSON.parse(rawData);
         
-        const autor = new schema.Entity('author',{},{idAttribute:'email'});
-        const msg = new schema.Entity('message',{},{idAttribute:'id'});
-        const post = new schema.Entity('posts',
-        {
-            posts: [{
-                    author: autor,
-                    message:[msg]
-                }]            
-        },{idAttribute:'id'});        
-        const normalizedPosts = normalize(parsedData,post)
+        const user = new schema.Entity('users',{},{idAttribute:'uId'});
+        const msg = new schema.Entity('messages',{
+            author: user
+        },{idAttribute:'mId'});
+        const post = new schema.Entity('posts',{
+            author: user,
+            message: msg
+        },{idAttribute:'pId'});
+        const mySchema = {posts:[post]};
+
+        console.log(parsedData);
+        const normalizedPosts = normalize(parsedData,mySchema)
         let compresion = ((JSON.stringify(normalizedPosts).length / JSON.stringify(parsedData).length ) * 100) + "%"
         let feData = {
             posts: parsedData.posts,
