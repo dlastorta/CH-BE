@@ -1,0 +1,99 @@
+{{#if data.usuario}}
+<body>
+    <h1>Bienvenido {{data.usuario}}</h1>
+    <a href="/logout">Logout</a>
+    <h2>Lista de Productos</h2>
+    {{#if data.productos}}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Foto</th>
+            </tr>
+            {{#each data.productos}}
+            <tr>
+                <td>{{this.id}}</td>
+                <td>{{this.title}}</td>
+                <td>{{this.price}}</td>
+                <td><img src="{{this.thumbnail}}"></td>
+            </tr>
+            {{/each}}
+        </table>
+    {{else}}
+        <h2>No se encontraron productos</h2>
+    {{/if}}
+    <h1>Centro de Mensajes</h1>
+    <h1 id="compresion"></h1>
+    <div id="error" style="color:red"></div>
+    <form id='formmessages' onsubmit="return addMessages(this)">
+        <input type="text" id="email" placeholder="Tu Email"><br>
+        <input type="text" id="nombre" placeholder="Tu Nombre"><br>
+        <input type="text" id="apellido" placeholder="Tu Apellido"><br>
+        <input type="text" id="edad" placeholder="Tu Edad"><br>
+        <input type="text" id="alias" placeholder="Tu Alias"><br>
+        <input type="text" id="avatar" placeholder="Tu Avatar"><br>
+        <input type="text" id="texto" placeholder="Cuentanos Algo.."><br>
+        <input type="submit" id="username" value="Enviar">
+    </form>
+    <div id="messages">
+    </div>
+    <script>
+        const socket = io();
+        const form = document.getElementById('form');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+        });
+
+        let renderNewMessage = (data) => {
+            if (data.length !== 0) {
+                document.getElementById('compresion').innerHTML = `La compresion es ${data.compresion}`;
+                console.log('parsedData');
+                console.log(data.parsedData);
+                console.log('Normalized Posts');
+                console.log(data.normalizedPosts);
+
+                var html = data.posts.map((elem, index) => {
+                    return (`<div>
+                        <strong>${elem.author.email}</strong>
+                        ${elem.message.date}:
+                        <em>${elem.message.texto}</em>
+                    </div>`)
+                }).join(" ");
+                document.getElementById('messages').innerHTML = html;
+            }
+        };
+
+        let addMessages = (e) => {
+            let email = document.getElementById('email').value;
+            document.getElementById('error').innerHTML = "";
+            var autor = {
+                email: document.getElementById('email').value,
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                edad: document.getElementById('edad').value,
+                alias: document.getElementById('alias').value,
+                avatar: document.getElementById('avatar').value
+            }
+            var post = {
+                author: autor,
+                message: {
+                    texto: document.getElementById('texto').value,
+                    date: moment().format('DD/MM/YYYY HH:MM:SS'),
+                }
+
+            }
+            socket.emit('new-message', post);
+            return false;
+        };
+
+        socket.on('messages', (data) => {
+            renderNewMessage(data);
+        });
+    </script>
+
+</body>
+{{else}}
+<h2>No Autorizado</h2>
+{{/if}}
