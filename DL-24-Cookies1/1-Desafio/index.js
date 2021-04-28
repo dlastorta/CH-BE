@@ -94,17 +94,24 @@ app.post('/login', (req,res)=>{
     {
         res.sendStatus(401);
     } else {
-        console.log(req.body.user);
-        console.log(req.body.password);
-        let data = {
-            usuario: req.body.user,
-            productos: productos,
-            
-        };
-        console.log(data);
-        res.render("vista", {data});  
+        console.log(req.session.user);
+        if(typeof(req.session) !== 'undefined' && typeof(req.session.user) !== 'undefined'){
+            console.log(req.session.user);
+            let data = {
+                usuario: req.session.user,
+                productos: productos,
+                
+            };
+            res.render("vista", {data});  
+        } else if(req.body.user === "Diego" && req.body.password === "123"){
+            let data = {
+                usuario: req.body.user,
+                productos: productos
+            };
+            req.session.user = req.body.user;
+            res.render("vista", {data});  
+        }
     }
-       
 });
 
 //Events
