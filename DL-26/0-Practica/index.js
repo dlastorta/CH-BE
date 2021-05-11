@@ -10,6 +10,9 @@ const LocalStrategy = require('passport-local').Strategy;
 const { use } = require('passport');
 const cookieParser = require('cookie-parser');
 
+const MongoStore = require('connect-mongo');
+
+
 passport.use('login', new LocalStrategy({
     passReqToCallback: true
 }, 
@@ -88,19 +91,27 @@ const isValidPassword = (user,password) => {
 
 app.use(bodyParser.urlencoded({ extended: true })); 
 app.use(cookieParser)
-app.use(session({
-    secret: 'keyboard cat',
-    resave: true,
-    saveUninitialized: true,
-    rolling: true, 
-    resave: true,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: false,
-        secure: false,
-        maxAge: 36000
-    }
-}));
+app.use(
+    session({
+        store: MongoStore.create({
+            mongoUrl:"mongodb+srv://eeoadmin:D722EMPBzMtgG3c@coderhouse.fclea.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+            mongoOptions:{
+                useNewUrlParser:true,
+                useUnifiedTopology: true
+            }
+        }),
+        secret: 'keyboard cat',
+        resave: true,
+        saveUninitialized: true,
+        rolling: true, 
+        resave: true,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: false,
+            secure: false,
+            maxAge: 36000
+        }
+    }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.engine(
@@ -115,14 +126,6 @@ app.engine(
 app.set("views", "./views");
 app.set("view engine", "hbs");
 app.use(express.static(__dirname + '/public'));
-let auth = (req,res,next) =>{
-    if(req.session && req.session.user){
-        return next();
-    } else {
-        res.render("login", {error:"Usted no esta autorizado."});
-    }
-}
-
 // Middleware
 
 const checkAuthentication = (req,res,next)=>{
