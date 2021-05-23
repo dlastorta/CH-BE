@@ -11,7 +11,16 @@ const { use } = require('passport');
 const cookieParser = require('cookie-parser');
 
 const MongoStore = require('connect-mongo');
+require("./model/user.js"); 
+const mongoose = require('mongoose')
+var User= mongoose.model('User'); 
 
+let DBUP = () => {
+    const uri  = "mongodb+srv://eeoadmin:D722EMPBzMtgG3c@coderhouse.fclea.mongodb.net/eCommerce?retryWrites=true&w=majority";
+    mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    console.log('DB UP');
+}
+DBUP();
 
 passport.use('login', new LocalStrategy({
     passReqToCallback: true
@@ -26,8 +35,7 @@ passport.use('login', new LocalStrategy({
                 if(!user){
                     return done(null, false,console.log('message', 'User Not Found'));
                 }
-                if(!isValidPassword(user,passwor)){
-                    console.log("Invalid Password");
+                if(!isValidPassword(user,password)){
                     return done(null, false, console.log('message', 'Invalid Password'));
                 }
                 return done(null, user);
@@ -39,22 +47,19 @@ passport.use('login', new LocalStrategy({
 passport.use('signup', new LocalStrategy(
     {passReqToCallback:true},
     function(req,username, password, done){
-        let findOrCreateUse = () =>{
+        let findOrCreateUser = () =>{
             User.findOne({'username':username},(err,user)=>{
                 if(err){
                     console.log('Error in Signup: ' + err);
                     return done(err);
                 }
                 if(user){
-                    console.log("User already exists");
                     return done(null,false,console.log("message","User already exists"));
                 } else {
                     let newUser = new User();
                     newUser.username = username,
-                    newUser.password = password,
-                    newUser.email = req.body.email,
-                    newUser.firstName = req.body.firstName,
-                    newUser.lastName = req.body.lastName
+                    newUser.password = createHash(password),
+                    newUser.email = req.body.email                    
 
                     newUser.save((err)=>{
                         if(err){
@@ -67,7 +72,7 @@ passport.use('signup', new LocalStrategy(
                 }
             });            
         };
-        process.nextTick(findOrCreateUse);
+        process.nextTick(findOrCreateUser);
     })
 )
 
@@ -81,7 +86,7 @@ passport.deserializeUser((id,done)=>{
     })
 });
 
-const createHash = () => {
+const createHash = (password) => {
     return bCrypt.hashSync(password, bCrypt.genSaltSync(10),null);
 };
 
@@ -90,7 +95,7 @@ const isValidPassword = (user,password) => {
 };
 
 app.use(bodyParser.urlencoded({ extended: true })); 
-app.use(cookieParser)
+//app.use(cookieParser)
 app.use(
     session({
         store: MongoStore.create({
@@ -137,73 +142,59 @@ const checkAuthentication = (req,res,next)=>{
 };
 
 //Routes
-
-app.get('*', (req,res)=>{
+/*app.get('*', (req,res)=>{
     console.log('*')
     res.status(404).render('routing-error',{}); 
-});
+});*/
 app.get('/',(req,res)=>{
-    console.log('/')
     res.render("login");   
 });
 
 app.get('/datos',checkAuthentication,(req,res)=>{
-    /*if(true ){
-        let data = req.user
-        res.render("datos",{data});
-    } else {
-        res.render("login", {error:"Usted no esta autorizado."});
-    }*/
-    console.log('datos')
-    res.render("datos");
+    let user = req.user;
+    console.log(user);
+    res.render("datos", user);
 });
 
 app.get('/failRoute',(req,res)=>{
-    console.log('failRoute')
     res.status(404).render('routing-error',{})
 })
 
 app.get('/login',(req,res)=>{
     if(req.isAuthenticated()){
-        console.log('if login')
         let user = req.user;
-        res.render('login', { user });   
+        res.render("datos", user);          
     } else {
-        console.log('else login')
         res.render('login')
     }    
 });
 
-app.post('/login',passport.authenticate('login',{ failureRedirect: '/failLogin'},(req,res)=>{
+app.post('/login',passport.authenticate('login',{ failureRedirect: '/failLogin'}),(req,res)=>{
     let user = req.user;
-    console.log('profileUser')
-    res.render('profileUser');
-}));
+    res.render("datos", user);  
+});
+
 app.get('/failLogin',  (req,res)=>{
-    console.log('failLogin')
-    res.status(404).render('login-error',{})
+    res.status(404).render('login',{})
 });
 
 
 app.get('/logout',(req,res)=>{
-    console.log('logout')
     req.logout();
-    res.render("index");   
+    res.render("logout");   
 });
 
 app.get('/signup',(req,res)=>{
-    console.log('signup')
     res.render("signup");   
 });
 
-app.post('/signup',passport.authenticate('signup',{ failureSignup: '/failSignup'},(req,res)=>{
+app.post('/signup',passport.authenticate('signup',{ failureSignup: '/failSignup'}),(req,res)=>{
     let user = req.user;
-    console.log('psignup')
-    res.render('profileUser');
-}));
+    res.render("datos", user);
+});
+
 app.get('/failSignup', (req,res)=>{
-    console.log('failSignup')
-    res.status(404).render('signup-error',{})
+    res.status(404).render('signup',{})
 });
 
 //server
