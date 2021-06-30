@@ -1,0 +1,27 @@
+<form method="POST" action="/login">
+    <h1>Login</h1>
+    {{#if error}}
+        <h2>{{error}}</h2>
+    {{/if}}
+    <div>
+        <label>Usuario</label>
+        {{#if data.username}}
+        <input type="text" name="username" value={{data.username}}/>
+        {{else}}
+        <input type="text" name="username"/>
+        {{/if}}
+    </div>
+    <div>
+        <label>Contraseña</label>
+         {{#if data.password}}
+        <input type="text" name="username" value={{data.password}}/>
+         {{else}}
+        <input type="text" name="password"/>
+         {{/if}}
+    </div>
+    <div>
+        <input type="submit" name="login" value="Login">
+        <br>
+        <a href="/signup"/>Registrarse</a> 
+    </div>    
+</form>
