@@ -1,12 +1,8 @@
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
 const server = require('http').Server(app);
-const handlebars = require('express-handlebars');
 const session = require('express-session');
-const bCrypt = require('bCrypt');
 const passport = require('passport');
-const FacebookStrategy = require('passport-facebook').Strategy;
 
 const MongoStore = require('connect-mongo');
 require("./model/user.js"); 
@@ -20,51 +16,6 @@ let DBUP = () => {
 }
 DBUP();
 
-passport.use('login', new FacebookStrategy({
-    clientID: "1468688820163800",
-    clientSecret:"70d10ac407c639894b4a8025d040ea10",
-    callbackURL: "http://localhost:8080/auth/facebook"
-}, 
-    function(accessToken,refreshToken,profile,done){
-        console.log("p use");
-        User.findOrCreate(
-            profile.id,
-            function(err,user){
-                if(err) {return done(err);}
-                console.log(profile);
-                console.log(user);
-                done(null, user)
-                
-            }
-        )
-    }
-));
-
-passport.use('signup', new FacebookStrategy({
-    clientID: process.env.FACEBOOK_APP_ID,
-    clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: "http://localhost:8080/auth/facebook/callback"
-    },
-    function(accessToken,refreshToken, profile, done){
-        User.findOrCreate(profile.id, function(err,user){
-            if(err) {return done(err)};
-            done(null,user)
-        })
-    })
-);
-
-
-passport.serializeUser((user,done)=>{
-    done(null, user._id);
-})
-
-passport.deserializeUser((id,done)=>{
-    User.findById(id, (err,user)=>{
-        done(err,user);
-    })
-});
-
-app.use(bodyParser.urlencoded({ extended: true })); 
 app.use(
     session({
         store: MongoStore.create({
@@ -86,84 +37,38 @@ app.use(
             maxAge: 36000
         }
     }));
+
+const FacebookStrategy = require('passport-facebook').Strategy;
+app.use(express.urlencoded({ extended: true })); 
 app.use(passport.initialize());
 app.use(passport.session());
-app.engine(
-    "hbs", 
-    handlebars({
-        extname:".hbs",
-        defaultLayout:"index.hbs",
-        layoutsDir: __dirname + "/views/layouts/",
-        partialsDir: __dirname + "/views/partials/",
+passport.use('facebook',new FacebookStrategy({
+    clientID: "1468688820163800",
+    clientSecret: "70d10ac407c639894b4a8025d040ea10",
+    callbackURL: "http://localhost:8080/auth/facebook/callback"
+    },
+    function(accessToken,refreshToken, profile, done){
+        console.log(profile);        
     })
 );
-app.set("views", "./views");
-app.set("view engine", "hbs");
-app.use(express.static(__dirname + '/public'));
-// Middleware
-
-const checkAuthentication = (req,res,next)=>{
-    if(req.isAuthenticated()){
-        next();
-    } else {
-        res.redirect("/login");
-    }
-};
-
-//Routes
-app.get('/',(req,res)=>{
-    res.render("login");   
-});
-
-app.get('/datos',checkAuthentication,(req,res)=>{
-    console.log("datos");
-    let user = req.user;
-    console.log(user);
-    res.render("datos", user);
-});
-
-app.get('/failRoute',(req,res)=>{
-    res.status(404).render('routing-error',{})
-})
-
-app.get('/login',(req,res)=>{
-    res.render('login');    
-});
 
 app.get('/auth/facebook', passport.authenticate('facebook'));
 
 app.get('/auth/facebook/callback',passport.authenticate('facebook', {
-    successRedirect: '/datos',
+    successRedirect: '/',
     failureRedirect: '/failLogin'
 }));
+
+app.get('/',passport.authenticate('facebook',{ failureRedirect: '/failLogin'}),(req,res)=>{
+    console.log("GET LOGIN");
+    console.log(req.user);
+    console.log(req.body);    
+});
 
 app.post('/login',passport.authenticate('login',{ failureRedirect: '/failLogin'}),(req,res)=>{
     console.log("POST LOGIN");
     let user = req.user;
     res.render("datos", user);  
-});
-
-app.get('/failLogin',  (req,res)=>{
-    res.status(404).render('login',{})
-});
-
-
-app.get('/logout',(req,res)=>{
-    req.logout();
-    res.render("logout");   
-});
-
-app.get('/signup',(req,res)=>{
-    res.render("signup");   
-});
-
-app.post('/signup',passport.authenticate('signup',{ failureSignup: '/failSignup'}),(req,res)=>{
-    let user = req.user;
-    res.render("datos", user);
-});
-
-app.get('/failSignup', (req,res)=>{
-    res.status(404).render('signup',{})
 });
 
 //server
